@@ -1,1 +1,3 @@
 # DEEP_U-net_Project
+
+Need to upload the DRIVE dataset into google drive s.t. a folder for it is created when drive.mount('/content/drive/', force_remount=True) is run, and the image folders can be accessed...
