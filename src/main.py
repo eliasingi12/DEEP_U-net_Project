@@ -1,4 +1,5 @@
-import os  # misc operating system specific operations, e.g., reading directries. 
+import os  # misc operating system specific operations, e.g., reading directries.
+import sys
 import random
 
 import cv2
@@ -13,6 +14,8 @@ from keras.optimizers import SGD
 from sklearn.metrics import classification_report
 
 import matplotlib.pyplot as plt
+
+import training
 
 # Some parameters and paths to data
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -29,8 +32,8 @@ image_paths = []
 pre_dir = "./DRIVE/"
 
 args = {}
-args["training_imgs"] = os.path.join(dir_path,path_train,path_img)
-args["targets"] = os.path.join(dir_path,path_train,path_targets)
+args["training_imgs"] = os.path.join(dir_path,'..',path_train,path_img)
+args["targets"] = os.path.join(dir_path,'..',path_train,path_targets)
 
 for (dirpath, dirnames, filenames) in os.walk(args["training_imgs"]):
     for file in filenames:
@@ -62,3 +65,4 @@ for image_path in image_paths:
     
 show_images(original_imgs)
 
+training.unet()
