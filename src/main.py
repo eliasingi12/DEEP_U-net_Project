@@ -24,25 +24,29 @@ path_test = 'DRIVE/test/'
 path_img = 'images'
 path_mask = 'mask'
 path_targets = '1st_manual'
+path_tif_targets = '1st_manual_tif'
 
 # Read in the file paths of the images to use for the training.
 random_seed = 42
 sz = 64
 image_paths = []
-pre_dir = "./DRIVE/"
+target_paths = []
 
 args = {}
 args["training_imgs"] = os.path.join(dir_path,'..',path_train,path_img)
-args["targets"] = os.path.join(dir_path,'..',path_train,path_targets)
+args["targets"] = os.path.join(dir_path,'..',path_train,path_tif_targets)
 
 for (dirpath, dirnames, filenames) in os.walk(args["training_imgs"]):
     for file in filenames:
         if '.tif' in file and not file.startswith('.'):
               image_paths.append(os.path.join(dirpath, file))
+
+for (dirpath, dirnames, filenames) in os.walk(args["targets"]):
+    for file in filenames:
+        if '.tiff' in file and not file.startswith('.'):
+              target_paths.append(os.path.join(dirpath, file))
                 
 random.seed(random_seed)
-random.shuffle(image_paths)
-
 
 def show_images(imgs, grid_size=3):
     f, axarr = plt.subplots(grid_size,grid_size, figsize=(15, 15))
@@ -53,16 +57,20 @@ def show_images(imgs, grid_size=3):
   
 
 input_data   = []
-input_labels = []
-original_imgs = []
 for image_path in image_paths:
     image = cv2.imread(image_path)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    original_imgs.append(image)
     input_data.append(image)
-    label = image_path.split(os.path.sep)[-2]
-    input_labels.append(label)
     
-show_images(original_imgs)
+
+target_data = []
+for target_path in target_paths:
+    target = cv2.imread(target_path)
+    #print(target)
+    target_data.append(target)
+    #print(target_data)
+
+
+show_images(target_data)
 
 training.unet()
