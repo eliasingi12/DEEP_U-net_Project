@@ -9,6 +9,10 @@ import matplotlib.pyplot as plt
 
 from unet import unet
 
+#resize inputs & targets
+import skimage
+from skimage.transform import resize
+
 # Some parameters and paths to data
 dir_path = os.path.dirname(os.path.realpath(__file__))
 path_train = 'DRIVE/training/'
@@ -51,23 +55,36 @@ def show_images(imgs, grid_size=3):
 input_data = []
 for image_path in image_paths:
     image = cv2.imread(image_path)
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    image = resize(image, (560, 560), anti_aliasing=True)
+    #image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     input_data.append(image)
     
 
 target_data = []
 for target_path in target_paths:
     target = cv2.imread(target_path)
+    target = resize(target, (560, 560), anti_aliasing=True)
+    #target = cv2.cvtColor(target, cv2.COLOR_BGR2GRAY)
     #print(target)
     target_data.append(target)
     #print(target_data)
 
 h,w,ch = target_data[0].shape
-show_images(target_data)
+
+#print(target_data[0].shape)
+#print(input_data[0].shape)
+#show_images(target_data)
 
 EPOCHS=5
 
 model = unet(h,w,ch)
 model.summary()
+
+
+input_data = np.array(input_data)
+target_data = np.array(target_data)
+print(target_data.shape)
+print(input_data.shape)
+#input_data = np.reshape(input_data, (20,584,565,3))
 
 model.fit(input_data, target_data, epochs=EPOCHS, batch_size=1)

@@ -40,7 +40,7 @@ def unet(height,width,n_ch):
 
     # First up layers
     upsamp1 = UpSampling2D((2,2))(conv5)
-    crop1 = Cropping2D(cropping=((1,0),(0,0)))(conv4)
+    crop1 = Cropping2D(cropping=((0,0),(0,0)))(conv4)
     concat1 = concatenate([upsamp1,crop1])
 
     conv6 = Conv2D(512, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(concat1)
@@ -48,7 +48,7 @@ def unet(height,width,n_ch):
 
     # Second up layers
     upsamp2 = UpSampling2D((2,2))(conv6)
-    crop2 = Cropping2D(cropping=((1,1),(1,0)))(conv3)
+    crop2 = Cropping2D(cropping=((0,0),(0,0)))(conv3)
     concat2 = concatenate([upsamp2,crop2])
 
     conv7 = Conv2D(256, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(concat2)
@@ -56,7 +56,7 @@ def unet(height,width,n_ch):
 
     # Third up layers
     upsamp3 = UpSampling2D((2,2))(conv7)
-    crop3 = Cropping2D(cropping=((2,2),(1,1)))(conv2)
+    crop3 = Cropping2D(cropping=((0,0),(0,0)))(conv2)
     concat3 = concatenate([upsamp3,crop3])
 
     conv8 = Conv2D(128, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(concat3)
@@ -64,18 +64,18 @@ def unet(height,width,n_ch):
 
     # Fourth up layers
     upsamp4 = UpSampling2D((2,2))(conv8)
-    crop4 = Cropping2D(cropping=((4,4),(2,3)))(conv1)
+    crop4 = Cropping2D(cropping=((0,0),(0,0)))(conv1)
     concat4 = concatenate([upsamp4,crop4])
 
     conv9 = Conv2D(64, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(concat4)
     conv9 = Conv2D(64, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(conv9)
 
     # Output layer
-    outconv = Conv2D(2, (1,1), kernel_initializer='random_uniform', activation='sigmoid', data_format='channels_last')(conv9)
+    outconv = Conv2D(3, (1,1), kernel_initializer='random_uniform', padding='same', activation='sigmoid', data_format='channels_last')(conv9)
 
     model = Model(inputs=inputs, outputs=outconv)
 
     #sgd = SGD(lr=0.01, decay=1e-6, momentum=0.3, nesterov=False)
-    model.compile(optimizer='sgd', loss='categorical_crossentropy', metrics=['accuracy'])
+    model.compile(optimizer='sgd', loss='binary_crossentropy', metrics=['accuracy'])
 
     return model
