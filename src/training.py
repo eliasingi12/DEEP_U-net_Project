@@ -4,24 +4,78 @@ import random
 import cv2
 import numpy as np
 
-from sklearn.preprocessing import LabelBinarizer
-from sklearn.model_selection import train_test_split
-
-from keras.layers import Input
+from keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D, concatenate
 from keras.models import Sequential
 from keras.layers.core import Dense
 from keras.optimizers import SGD
 from sklearn.metrics import classification_report
 
-import matplotlib.pyplot as plt
 
-# unet((584,565,1))
+# unet(3,584,565)
+# unet(n_ch,height,width)
 
-def unet(input_shape):
+def unet(n_ch,height,width):
+    inputs = Input((height,width,n_ch))
 
-    input_shape = Input(input_shape)
+    # First set of layers
+    conv1 = Conv2D(64, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(inputs)
+    conv1 = Conv2D(64, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(conv1)
+    pool1 = MaxPooling2D((2,2))(conv1)
 
-    c1 = keras.layers.Conv2D(input_shape,n_filters=1,kernel_size=3,padding='same',
-                            kernel_initializer='random_uniform')
-    
+    # Second set of layers
+    conv2 = Conv2D(128, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(pool1)
+    conv2 = Conv2D(128, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(conv2)
+    pool2 = MaxPooling2D((2,2))(conv2)
+
+    # Third set of layers
+    conv3 = Conv2D(256, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(pool2)
+    conv3 = Conv2D(256, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(conv3)
+    pool3 = MaxPooling2D((2,2))(conv3)
+
+    # Fourth set of layers
+    conv4 = Conv2D(512, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(pool3)
+    conv4 = Conv2D(512, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(conv4)
+    pool4 = MaxPooling2D((2,2))(conv4)
+
+    # Fifth set of layers
+    conv5 = Conv2D(1024, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(pool4)
+    conv5 = Conv2D(1024, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(conv5)
+
+    # First up layers
+    upsamp1 = UpSampling2D((2,2))(conv5)
+    concat1 = concatenate([upsamp1,conv4])
+
+    conv6 = Conv2D(512, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(concat1)
+    conv6 = Conv2D(512, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(conv6)
+
+    # Second up layers
+    upsamp2 = UpSampling2D((2,2))(conv6)
+    concat2 = concatenate([upsamp2,conv3])
+
+    conv7 = Conv2D(256, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(concat2)
+    conv7 = Conv2D(256, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(conv7)
+
+    # Third up layers
+    upsamp3 = UpSampling2D((2,2))(conv7)
+    concat3 = concatenate([upsamp3,conv2])
+
+    conv8 = Conv2D(128, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(concat3)
+    conv8 = Conv2D(128, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(conv8)
+
+
+    # Fourth up layers
+    upsamp4 = UpSampling2D((2,2))(conv8)
+    concat4 = concatenate([upsamp4,conv1])
+
+    conv9 = Conv2D(64, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(concat4)
+    conv9 = Conv2D(64, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(conv9)
+
+    # Output layer
+    outconv = Conv2D(2, (1,1), padding='same', kernel_initializer='random_uniform', activation='sigmoid', data_format='channels_last')(conv9)
+
+    model = Model(inputs=inputs, outputs=outconv)
+
+    # sgd = SGD(lr=0.01, decay=1e-6, momentum=0.3, nesterov=False)
+    model.compile(optimizer='sgd', loss='categorical_crossentropy', metrics=['accuracy'])
+
     return model

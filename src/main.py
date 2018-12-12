@@ -56,7 +56,7 @@ def show_images(imgs, grid_size=3):
     plt.show()
   
 
-input_data   = []
+input_data = []
 for image_path in image_paths:
     image = cv2.imread(image_path)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -71,6 +71,9 @@ for target_path in target_paths:
     #print(target_data)
 
 
+print(target_data[0].shape)
+
+
 show_images(target_data)
 
-training.unet()
+#training.unet()
