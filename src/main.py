@@ -5,14 +5,6 @@ import random
 import cv2
 import numpy as np
 
-from sklearn.preprocessing import LabelBinarizer
-from sklearn.model_selection import train_test_split
-
-from keras.models import Sequential
-from keras.layers.core import Dense
-from keras.optimizers import SGD
-from sklearn.metrics import classification_report
-
 import matplotlib.pyplot as plt
 
 from unet import unet
@@ -76,5 +68,6 @@ show_images(target_data)
 EPOCHS=5
 
 model = unet(h,w,ch)
+model.summary()
 
 model.fit(input_data, target_data, epochs=EPOCHS, batch_size=1)

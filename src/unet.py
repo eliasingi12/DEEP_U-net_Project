@@ -40,7 +40,7 @@ def unet(height,width,n_ch):
 
     # First up layers
     upsamp1 = UpSampling2D((2,2))(conv5)
-    concat1 = concatenate([upsamp1,conv4])
+    concat1 = concatenate([upsamp1,conv4], axis=1)
 
     conv6 = Conv2D(512, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(concat1)
     conv6 = Conv2D(512, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(conv6)
@@ -67,7 +67,7 @@ def unet(height,width,n_ch):
     conv9 = Conv2D(64, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(conv9)
 
     # Output layer
-    outconv = Conv2D(2, (1,1), padding='same', kernel_initializer='random_uniform', activation='sigmoid', data_format='channels_last')(conv9)
+    outconv = Conv2D(2, (1,1), kernel_initializer='random_uniform', activation='sigmoid', data_format='channels_last')(conv9)
 
     model = Model(inputs=inputs, outputs=outconv)
 
