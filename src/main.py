@@ -51,7 +51,7 @@ def show_images(imgs, grid_size=3):
             axarr[i,j].imshow(imgs[i*grid_size+j])
     plt.show()
   
-
+image_paths.sort()
 input_data = []
 for image_path in image_paths:
     image = cv2.imread(image_path)
@@ -59,7 +59,7 @@ for image_path in image_paths:
     #image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     input_data.append(image)
     
-
+target_paths.sort()
 target_data = []
 for target_path in target_paths:
     target = cv2.imread(target_path)
