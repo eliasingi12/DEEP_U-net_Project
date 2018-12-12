@@ -15,7 +15,7 @@ from sklearn.metrics import classification_report
 
 import matplotlib.pyplot as plt
 
-import training
+from unet import unet
 
 # Some parameters and paths to data
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -70,10 +70,11 @@ for target_path in target_paths:
     target_data.append(target)
     #print(target_data)
 
-
-print(target_data[0].shape)
-
-
+h,w,ch = target_data[0].shape
 show_images(target_data)
 
-#training.unet()
+EPOCHS=5
+
+model = unet(h,w,ch)
+
+model.fit(input_data, target_data, epochs=EPOCHS, batch_size=1)

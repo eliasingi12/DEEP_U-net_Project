@@ -11,10 +11,7 @@ from keras.optimizers import SGD
 from sklearn.metrics import classification_report
 
 
-# unet(3,584,565)
-# unet(n_ch,height,width)
-
-def unet(n_ch,height,width):
+def unet(height,width,n_ch):
     inputs = Input((height,width,n_ch))
 
     # First set of layers
@@ -62,7 +59,6 @@ def unet(n_ch,height,width):
     conv8 = Conv2D(128, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(concat3)
     conv8 = Conv2D(128, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(conv8)
 
-
     # Fourth up layers
     upsamp4 = UpSampling2D((2,2))(conv8)
     concat4 = concatenate([upsamp4,conv1])
@@ -75,7 +71,7 @@ def unet(n_ch,height,width):
 
     model = Model(inputs=inputs, outputs=outconv)
 
-    # sgd = SGD(lr=0.01, decay=1e-6, momentum=0.3, nesterov=False)
+    #sgd = SGD(lr=0.01, decay=1e-6, momentum=0.3, nesterov=False)
     model.compile(optimizer='sgd', loss='categorical_crossentropy', metrics=['accuracy'])
 
     return model
