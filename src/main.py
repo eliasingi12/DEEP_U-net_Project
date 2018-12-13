@@ -63,7 +63,7 @@ for target_path in target_paths:
     #target = cv2.cvtColor(target, cv2.COLOR_BGR2GRAY)
     target_data.append(target)
 
-#h,w,ch = target_data[0].shape
+h,w = target_data[0].shape
 
 #print(target_data[0].shape)
 #print(input_data[0].shape)
@@ -71,8 +71,8 @@ for target_path in target_paths:
 
 EPOCHS=5
 
-#model = unet(h,w,ch)
-#model.summary()
+model = unet(h,w)
+model.summary()
 
 
 input_data = np.array(input_data)
