@@ -11,8 +11,8 @@ from keras.optimizers import SGD
 from sklearn.metrics import classification_report
 
 
-def unet(height,width):
-    inputs = Input((height,width,1))
+def unet(height,width,n_ch):
+    inputs = Input((height,width,n_ch))
 
     # First set of layers
     conv1 = Conv2D(64, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu')(inputs)

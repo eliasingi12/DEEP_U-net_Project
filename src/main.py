@@ -71,14 +71,19 @@ h,w = target_data[0].shape
 
 EPOCHS=5
 
-model = unet(h,w)
-model.summary()
-
 
 input_data = np.array(input_data)
 target_data = np.array(target_data)
-print(target_data.shape)
-print(input_data.shape)
+
+n_im, h, w = input_data.shape
+input_data = input_data.reshape((n_im,h,w,1))
+n_im, h, w = target_data.shape
+target_data = target_data.reshape((n_im,h,w,1))
+
+model = unet(h,w,1)
+model.summary()
+
+
 #input_data = np.reshape(input_data, (20,584,565,3))
 
 #model.fit(input_data, target_data, epochs=EPOCHS, batch_size=1)
