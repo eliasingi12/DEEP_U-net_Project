@@ -71,7 +71,7 @@ def unet(height,width,n_ch):
     conv9 = Conv2D(64, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu')(conv9)
 
     # Output layer
-    outconv = Conv2D(3, (1,1), kernel_initializer='random_uniform', padding='same', activation='sigmoid')(conv9)
+    outconv = Conv2D(1, (1,1), kernel_initializer='random_uniform', padding='same', activation='sigmoid')(conv9)
 
     model = Model(inputs=inputs, outputs=outconv)
 

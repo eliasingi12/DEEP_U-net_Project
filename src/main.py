@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from unet import unet
+from preprocess import img2bin
 
 # Some parameters and paths to data
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -50,7 +51,7 @@ def show_images(imgs, grid_size=3):
 image_paths.sort()
 input_data = []
 for image_path in image_paths:
-    image = cv2.imread(image_path, 0) # 0 -> greyscale
+    image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
     image = cv2.resize(image, (560, 560))
     #image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     input_data.append(image)
@@ -58,7 +59,7 @@ for image_path in image_paths:
 target_paths.sort()
 target_data = []
 for target_path in target_paths:
-    target = cv2.imread(target_path, 0)
+    target = cv2.imread(target_path, cv2.IMREAD_GRAYSCALE)
     target = cv2.resize(target, (560, 560))
     #target = cv2.cvtColor(target, cv2.COLOR_BGR2GRAY)
     target_data.append(target)
@@ -67,12 +68,27 @@ h,w = target_data[0].shape
 
 #print(target_data[0].shape)
 #print(input_data[0].shape)
+print(len(target_data[0][0]))
 #show_images(target_data)
+
+pre_target_data = []
+for img in target_data:
+    pre_target_data.append(img2bin(img))
+
+show_images(target_data)
+show_images(pre_target_data)
 
 EPOCHS=5
 
+""" for row in input_data[0]:
+    for col in row:
+        if col != 0:
+            print(row)
+            break """
 
-input_data = np.array(input_data)
+show_images(input_data)
+
+input_data = np.array(input_data)/255
 target_data = np.array(target_data)
 
 n_im, h, w = input_data.shape
@@ -80,8 +96,8 @@ input_data = input_data.reshape((n_im,h,w,1))
 n_im, h, w = target_data.shape
 target_data = target_data.reshape((n_im,h,w,1))
 
-model = unet(h,w,1)
-model.summary()
+#model = unet(h,w,1)
+#model.summary()
 
 
 #input_data = np.reshape(input_data, (20,584,565,3))
