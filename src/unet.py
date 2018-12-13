@@ -4,7 +4,7 @@ import random
 import cv2
 import numpy as np
 
-from keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D, concatenate, Cropping2D
+from keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D, concatenate, Cropping2D, core
 from keras.models import Sequential, Model
 from keras.layers.core import Dense
 from keras.optimizers import SGD
@@ -71,7 +71,8 @@ def unet(height,width,n_ch):
     conv9 = Conv2D(64, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu')(conv9)
 
     # Output layer
-    outconv = Conv2D(1, (1,1), kernel_initializer='random_uniform', padding='same', activation='sigmoid')(conv9)
+    conv10 = Conv2D(2, (1,1), kernel_initializer='random_uniform', padding='same', activation='relu')(conv9)
+    outconv = core.Activation('softmax')(conv10)
 
     model = Model(inputs=inputs, outputs=outconv)
 
