@@ -40,32 +40,32 @@ def unet(height,width,n_ch):
 
     # First up layers
     upsamp1 = UpSampling2D((2,2))(conv5)
-    crop1 = Cropping2D(cropping=((0,0),(0,0)))(conv4)
-    concat1 = concatenate([upsamp1,crop1])
+    #crop1 = Cropping2D(cropping=((0,0),(0,0)))(conv4)
+    concat1 = concatenate([upsamp1,conv4])
 
     conv6 = Conv2D(512, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(concat1)
     conv6 = Conv2D(512, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(conv6)
 
     # Second up layers
     upsamp2 = UpSampling2D((2,2))(conv6)
-    crop2 = Cropping2D(cropping=((0,0),(0,0)))(conv3)
-    concat2 = concatenate([upsamp2,crop2])
+    #crop2 = Cropping2D(cropping=((0,0),(0,0)))(conv3)
+    concat2 = concatenate([upsamp2,conv3])
 
     conv7 = Conv2D(256, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(concat2)
     conv7 = Conv2D(256, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(conv7)
 
     # Third up layers
     upsamp3 = UpSampling2D((2,2))(conv7)
-    crop3 = Cropping2D(cropping=((0,0),(0,0)))(conv2)
-    concat3 = concatenate([upsamp3,crop3])
+    #crop3 = Cropping2D(cropping=((0,0),(0,0)))(conv2)
+    concat3 = concatenate([upsamp3,conv2])
 
     conv8 = Conv2D(128, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(concat3)
     conv8 = Conv2D(128, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(conv8)
 
     # Fourth up layers
     upsamp4 = UpSampling2D((2,2))(conv8)
-    crop4 = Cropping2D(cropping=((0,0),(0,0)))(conv1)
-    concat4 = concatenate([upsamp4,crop4])
+    #crop4 = Cropping2D(cropping=((0,0),(0,0)))(conv1)
+    concat4 = concatenate([upsamp4,conv1])
 
     conv9 = Conv2D(64, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(concat4)
     conv9 = Conv2D(64, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu', data_format='channels_last')(conv9)
