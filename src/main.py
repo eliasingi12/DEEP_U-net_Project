@@ -9,10 +9,6 @@ import matplotlib.pyplot as plt
 
 from unet import unet
 
-#resize inputs & targets
-import skimage
-from skimage.transform import resize
-
 # Some parameters and paths to data
 dir_path = os.path.dirname(os.path.realpath(__file__))
 path_train = 'DRIVE/training/'
@@ -54,22 +50,20 @@ def show_images(imgs, grid_size=3):
 image_paths.sort()
 input_data = []
 for image_path in image_paths:
-    image = cv2.imread(image_path)
-    image = resize(image, (560, 560), anti_aliasing=True)
+    image = cv2.imread(image_path, 0) # 0 -> greyscale
+    image = cv2.resize(image, (560, 560))
     #image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     input_data.append(image)
     
 target_paths.sort()
 target_data = []
 for target_path in target_paths:
-    target = cv2.imread(target_path)
-    target = resize(target, (560, 560), anti_aliasing=True)
+    target = cv2.imread(target_path, 0)
+    target = cv2.resize(target, (560, 560))
     #target = cv2.cvtColor(target, cv2.COLOR_BGR2GRAY)
-    #print(target)
     target_data.append(target)
-    #print(target_data)
 
-h,w,ch = target_data[0].shape
+#h,w,ch = target_data[0].shape
 
 #print(target_data[0].shape)
 #print(input_data[0].shape)
@@ -77,8 +71,8 @@ h,w,ch = target_data[0].shape
 
 EPOCHS=5
 
-model = unet(h,w,ch)
-model.summary()
+#model = unet(h,w,ch)
+#model.summary()
 
 
 input_data = np.array(input_data)
@@ -87,4 +81,4 @@ print(target_data.shape)
 print(input_data.shape)
 #input_data = np.reshape(input_data, (20,584,565,3))
 
-model.fit(input_data, target_data, epochs=EPOCHS, batch_size=1)
+#model.fit(input_data, target_data, epochs=EPOCHS, batch_size=1)
