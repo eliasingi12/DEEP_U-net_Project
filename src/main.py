@@ -8,7 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from unet import unet
-from preprocess import img2bin
+from utils import img2bin, show_images
 
 # Some parameters and paths to data
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -40,13 +40,6 @@ for (dirpath, dirnames, filenames) in os.walk(args["targets"]):
               target_paths.append(os.path.join(dirpath, file))
                 
 random.seed(random_seed)
-
-def show_images(imgs, grid_size=3):
-    f, axarr = plt.subplots(grid_size,grid_size, figsize=(15, 15))
-    for i in range(grid_size):
-        for j in range(grid_size):
-            axarr[i,j].imshow(imgs[i*grid_size+j])
-    plt.show()
   
 image_paths.sort()
 input_data = []
@@ -103,3 +96,5 @@ outp = outp.reshape((512,512))
 # show network output image
 plt.imshow(outp, interpolation='nearest')
 plt.show()
+
+#train_out = model.predict(input_data)
