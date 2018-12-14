@@ -1,15 +1,23 @@
 import numpy as np
 
-def img2bin(img):
-    img_new = img.copy() # Make copy instead of changing origianl list
-    rows, cols = img_new.shape
-    for row in range(rows):
-        for col in range(cols):
-            if img_new[row][col]*255 > 100:
-                img_new[row][col] = 255
-            else:
-                img_new[row][col] = 0
-    return img_new
+
+def read_preproc(img_paths):
+    img_data = []
+    for path in img_paths:
+        image = cv2.imread(path)
+        image = cv2.resize(image, (512, 512))
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        img_data.append(image)
+    return img_data
+
+
+def list_img_paths(dir, format):
+    image_paths = []
+    for (dirpath, dirnames, filenames) in os.walk(dir):
+        for img in filenames:
+            if format in img and not img.startswith('.'):
+                image_paths.append(os.path.join(dirpath, img))
+    return image_paths
 
 
 def show_images(imgs, grid_size=3):
@@ -20,14 +28,26 @@ def show_images(imgs, grid_size=3):
     plt.show()
 
 
+def img2bin(img):
+    img_new = img.copy() # Make copy instead of changing origianl list
+    rows, cols = img_new.shape
+    for row in range(rows):
+        for col in range(cols):
+            if img_new[row][col]*255 > 100:
+                img_new[row][col] = 1
+            else:
+                img_new[row][col] = 0
+    return img_new.astype(int)
+
+
 def iou(pred,target):
     intersection = pred*target
     notTrue = 1 - target
     union = target + (notTrue * pred)
-    return sum(intersection)/sum(union)
+    return np.sum(intersection)/np.sum(union)
 
 
-def avg_iou(preds,targtes):
+def avg_iou(preds,targets):
 
     assert len(preds) == len(targets)
     
