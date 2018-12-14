@@ -51,55 +51,55 @@ def show_images(imgs, grid_size=3):
 image_paths.sort()
 input_data = []
 for image_path in image_paths:
-    image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
-    image = cv2.resize(image, (560, 560))
-    #image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    image = cv2.imread(image_path)
+    image = cv2.resize(image, (512, 512))
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     input_data.append(image)
     
 target_paths.sort()
 target_data = []
 for target_path in target_paths:
-    target = cv2.imread(target_path, cv2.IMREAD_GRAYSCALE)
-    target = cv2.resize(target, (560, 560))
-    #target = cv2.cvtColor(target, cv2.COLOR_BGR2GRAY)
+    target = cv2.imread(target_path)
+    target = cv2.resize(target, (512, 512))
+    target = cv2.cvtColor(target, cv2.COLOR_BGR2GRAY)
     target_data.append(target)
 
-h,w = target_data[0].shape
+input_data = np.array(input_data)
+target_data = np.array(target_data)
 
-#print(target_data[0].shape)
-#print(input_data[0].shape)
-print(len(target_data[0][0]))
-#show_images(target_data)
+#print(input_data.shape)
+#print(target_data.shape)
 
-pre_target_data = []
-for img in target_data:
-    pre_target_data.append(img2bin(img))
+input_data = input_data.reshape(input_data.shape[0], 512, 512, 1)
+target_data = target_data.reshape(target_data.shape[0], 512, 512, 1)
 
-show_images(target_data)
-show_images(pre_target_data)
+input_data = input_data.astype('float32')
+target_data = target_data.astype('float32')
+
+input_data/=255
+target_data/=255
+
+h, w, ch = input_data[0].shape
+#print(h)
+#print(w)
+#print(ch)
+
+#pre_target_data = []
+#for img in target_data:
+    #pre_target_data.append(img2bin(img))
 
 EPOCHS=5
 
-""" for row in input_data[0]:
-    for col in row:
-        if col != 0:
-            print(row)
-            break """
+model = unet(h,w,ch)
+model.summary()
 
-show_images(input_data)
+model.fit(input_data, target_data, epochs=EPOCHS, batch_size=1)
 
-input_data = np.array(input_data)/255
-target_data = np.array(target_data)
+pred_arr = input_data[0]
+pred_arr = np.expand_dims(pred_arr, axis=0)
+outp = model.predict(pred_arr, batch_size=1)
+outp = outp.reshape((512,512))
 
-n_im, h, w = input_data.shape
-input_data = input_data.reshape((n_im,h,w,1))
-n_im, h, w = target_data.shape
-target_data = target_data.reshape((n_im,h,w,1))
-
-#model = unet(h,w,1)
-#model.summary()
-
-
-#input_data = np.reshape(input_data, (20,584,565,3))
-
-#model.fit(input_data, target_data, epochs=EPOCHS, batch_size=1)
+# show network output image
+plt.imshow(outp, interpolation='nearest')
+plt.show()
