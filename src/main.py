@@ -8,7 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from unet import unet
-from utils import img2bin, show_images
+from utils import img2bin, show_images, avg_iou
 
 # Some parameters and paths to data
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -50,43 +50,39 @@ for image_path in image_paths:
     input_data.append(image)
     
 target_paths.sort()
-target_data = []
+train_target = []
 for target_path in target_paths:
     target = cv2.imread(target_path)
     target = cv2.resize(target, (512, 512))
     target = cv2.cvtColor(target, cv2.COLOR_BGR2GRAY)
-    target_data.append(target)
+    train_target.append(target)
 
 input_data = np.array(input_data)
-target_data = np.array(target_data)
+train_target = np.array(train_target)
 
 #print(input_data.shape)
-#print(target_data.shape)
+#print(train_target.shape)
 
 input_data = input_data.reshape(input_data.shape[0], 512, 512, 1)
-target_data = target_data.reshape(target_data.shape[0], 512, 512, 1)
+train_target = train_target.reshape(train_target.shape[0], 512, 512, 1)
 
 input_data = input_data.astype('float32')
-target_data = target_data.astype('float32')
+train_target = train_target.astype('float32')
 
 input_data/=255
-target_data/=255
+train_target/=255
 
 h, w, ch = input_data[0].shape
 #print(h)
 #print(w)
 #print(ch)
 
-#pre_target_data = []
-#for img in target_data:
-    #pre_target_data.append(img2bin(img))
-
 EPOCHS=5
 
 model = unet(h,w,ch)
 model.summary()
 
-model.fit(input_data, target_data, epochs=EPOCHS, batch_size=1)
+model.fit(input_data, train_target, epochs=EPOCHS, batch_size=1)
 
 pred_arr = input_data[0]
 pred_arr = np.expand_dims(pred_arr, axis=0)
@@ -97,4 +93,9 @@ outp = outp.reshape((512,512))
 plt.imshow(outp, interpolation='nearest')
 plt.show()
 
-#train_out = model.predict(input_data)
+train_pred = model.predict(input_data)
+
+train_target = train_target.reshape(train_target.shape[0], 512, 512)
+train_pred = train_pred.reshape(train_pred.shape[0], 512, 512) 
+
+print(avg_iou(train_pred,train_target))

@@ -1,8 +1,3 @@
-import os  # misc operating system specific operations, e.g., reading directries.
-import sys
-import random
-
-import cv2
 import numpy as np
 
 def img2bin(img):
@@ -30,3 +25,24 @@ def iou(pred,target):
     notTrue = 1 - target
     union = target + (notTrue * pred)
     return sum(intersection)/sum(union)
+
+
+def avg_iou(preds,targtes):
+
+    assert len(preds) == len(targets)
+    
+    targets = []
+    for img in train_target:
+        targets.append(img2bin(img))
+
+    preds = []
+    for img in train_pred:
+        preds.append(img2bin(img))
+
+    pred_targets = [(preds[i], targets[i]) for i in range(len(preds))]
+
+    train_iou = []
+    for pred, target in pred_targets:
+        train_iou.append(iou(pred,target))
+
+    return sum(train_iou)/len(preds)
