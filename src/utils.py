@@ -1,5 +1,8 @@
+import os
 import numpy as np
+import cv2
 
+# utils.py
 
 def read_preproc(img_paths):
     img_data = []
@@ -33,12 +36,11 @@ def img2bin(img):
     rows, cols = img_new.shape
     for row in range(rows):
         for col in range(cols):
-            if img_new[row][col]*255 > 100:
+            if img_new[row][col]*255 > 215:
                 img_new[row][col] = 1
             else:
                 img_new[row][col] = 0
     return img_new.astype(int)
-
 
 def iou(pred,target):
     intersection = pred*target
@@ -66,3 +68,11 @@ def avg_iou(preds,targets):
         train_iou.append(iou(pred,target))
 
     return sum(train_iou)/len(preds)
+  
+  
+def reshape_normalize(arr_to_reshape):
+    arr_to_reshape = arr_to_reshape.reshape(arr_to_reshape.shape[0], 512, 512, 1)
+    arr_to_reshape = arr_to_reshape.astype('float32')
+    arr_to_reshape /= 255
+    return arr_to_reshape
+  
