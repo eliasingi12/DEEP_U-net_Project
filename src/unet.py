@@ -1,80 +1,99 @@
-import os  # misc operating system specific operations, e.g., reading directries. 
-import random
-
-import cv2
-import numpy as np
-
-from keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D, concatenate, Cropping2D, core
+from keras.layers import Input, down2D, MaxPooling2D, UpSampling2D, concatenate, BatchNormalization, Activation
 from keras.models import Sequential, Model
-from keras.layers.core import Dense
 from keras.optimizers import SGD
-from sklearn.metrics import classification_report
-
 
 def unet(height,width,n_ch):
     inputs = Input((height,width,n_ch))
 
     # First set of layers
-    conv1 = Conv2D(64, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu')(inputs)
-    conv1 = Conv2D(64, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu')(conv1)
-    pool1 = MaxPooling2D((2,2))(conv1)
+    down1 = down2D(64, (3,3), padding='same')(inputs)
+    down1 = BatchNormalization()(down1)
+    down1 = Activation('relu')(down1)
+    down1 = down2D(64, (3,3), padding='same')(down1)
+    down1 = BatchNormalization()(down1)
+    down1 = Activation('relu')(down1)
+    down1 = MaxPooling2D((2,2))(down1)
 
     # Second set of layers
-    conv2 = Conv2D(128, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu')(pool1)
-    conv2 = Conv2D(128, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu')(conv2)
-    pool2 = MaxPooling2D((2,2))(conv2)
+    down2 = down2D(128, (3,3), padding='same')(down1)
+    down2 = BatchNormalization()(down2)
+    down2 = Activation('relu')(down2)
+    down2 = down2D(128, (3,3), padding='same')(down2)
+    down2 = BatchNormalization()(down2)
+    down2 = Activation('relu')(down2)
+    down2 = MaxPooling2D((2,2))(down2)
 
     # Third set of layers
-    conv3 = Conv2D(256, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu')(pool2)
-    conv3 = Conv2D(256, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu')(conv3)
-    pool3 = MaxPooling2D((2,2))(conv3)
+    down3 = down2D(256, (3,3), padding='same')(down2)
+    down3 = BatchNormalization()(down3)
+    down3 = Activation('relu')(down3)
+    down3 = down2D(256, (3,3), padding='same')(down3)
+    down3 = BatchNormalization()(down3)
+    down3 = Activation('relu')(down3)
+    down3 = MaxPooling2D((2,2))(down3)
 
     # Fourth set of layers
-    conv4 = Conv2D(512, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu')(pool3)
-    conv4 = Conv2D(512, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu')(conv4)
-    pool4 = MaxPooling2D((2,2))(conv4)
+    down4 = down2D(512, (3,3), padding='same')(down3)
+    down4 = BatchNormalization()(down4)
+    down4 = Activation('relu')(down4)
+    down4 = down2D(512, (3,3), padding='same')(down4)
+    down4 = BatchNormalization()(down4)
+    down4 = Activation('relu')(down4)
+    down4 = MaxPooling2D((2,2))(down4)
 
     # Fifth set of layers
-    conv5 = Conv2D(1024, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu')(pool4)
-    conv5 = Conv2D(1024, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu')(conv5)
+    mid = down2D(1024, (3,3), padding='same')(down4)
+    mid = BatchNormalization()(mid)
+    mid = Activation('relu')(mid)
+    mid = down2D(1024, (3,3), padding='same')(mid)
+    mid = BatchNormalization()(mid)
+    mid = Activation('relu')(mid)
 
     # First up layers
-    upsamp1 = UpSampling2D((2,2))(conv5)
-    #crop1 = Cropping2D(cropping=((0,0),(0,0)))(conv4)
-    concat1 = concatenate([upsamp1,conv4])
-
-    conv6 = Conv2D(512, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu')(concat1)
-    conv6 = Conv2D(512, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu')(conv6)
+    up4 = UpSampling2D((2,2))(mid)
+    up4 = concatenate([down4,up4], axis=3)
+    up4 = down2D(512, (3,3), padding='same')(up4)
+    up4 = BatchNormalization()(up4)
+    up4 = Activation('relu')(up4)
+    up4 = down2D(512, (3,3), padding='same')(up4)
+    up4 = BatchNormalization()(up4)
+    up4 = Activation('relu')(up4)
 
     # Second up layers
-    upsamp2 = UpSampling2D((2,2))(conv6)
-    #crop2 = Cropping2D(cropping=((0,0),(0,0)))(conv3)
-    concat2 = concatenate([upsamp2,conv3])
-
-    conv7 = Conv2D(256, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu')(concat2)
-    conv7 = Conv2D(256, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu')(conv7)
+    up3 = UpSampling2D((2,2))(up4)
+    up3 = concatenate([down3,up3])
+    up3 = down2D(256, (3,3), padding='same')(up3)
+    up3 = BatchNormalization()(up3)
+    up3 = Activation('relu')(up3)
+    up3 = down2D(256, (3,3), padding='same')(up3)
+    up3 = BatchNormalization()(up3)
+    up3 = Activation('relu')(up3)
 
     # Third up layers
-    upsamp3 = UpSampling2D((2,2))(conv7)
-    #crop3 = Cropping2D(cropping=((0,0),(0,0)))(conv2)
-    concat3 = concatenate([upsamp3,conv2])
-
-    conv8 = Conv2D(128, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu')(concat3)
-    conv8 = Conv2D(128, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu')(conv8)
+    up2 = UpSampling2D((2,2))(up3)
+    up2 = concatenate([down2,up2])
+    up2 = down2D(128, (3,3), padding='same')(up2)
+    up2 = BatchNormalization()(up2)
+    up2 = Activation('relu')(up2)
+    up2 = down2D(128, (3,3), padding='same')(up2)
+    up2 = BatchNormalization()(up2)
+    up2 = Activation('relu')(up2)
 
     # Fourth up layers
-    upsamp4 = UpSampling2D((2,2))(conv8)
-    #crop4 = Cropping2D(cropping=((0,0),(0,0)))(conv1)
-    concat4 = concatenate([upsamp4,conv1])
-
-    conv9 = Conv2D(64, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu')(concat4)
-    conv9 = Conv2D(64, (3,3), padding='same', kernel_initializer='random_uniform', activation='relu')(conv9)
+    up1 = UpSampling2D((2,2))(up2)
+    up1 = concatenate([up1,down1])
+    up1 = down2D(64, (3,3), padding='same')(up1)
+    up1 = BatchNormalization()(up1)
+    up1 = Activation('relu')(up1)
+    up1 = down2D(64, (3,3), padding='same')(up1)
+    up1 = BatchNormalization()(up1)
+    up1 = Activation('relu')(up1)
 
     # Output layer
-    conv10 = Conv2D(2, (1,1), kernel_initializer='random_uniform', padding='same', activation='relu')(conv9)
-    outconv = core.Activation('softmax')(conv10)
+    out = down2D(1, (1,1), padding='same')(up1)
+    out = Activation('sigmoid')(out)
 
-    model = Model(inputs=inputs, outputs=outconv)
+    model = Model(inputs=inputs, outputs=out)
 
     #sgd = SGD(lr=0.01, decay=1e-6, momentum=0.3, nesterov=False)
     model.compile(optimizer='sgd', loss='binary_crossentropy', metrics=['accuracy'])
