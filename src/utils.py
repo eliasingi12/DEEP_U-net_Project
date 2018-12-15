@@ -53,15 +53,15 @@ def avg_iou(preds,targets):
 
     assert len(preds) == len(targets)
     
-    targets = []
-    for img in train_target:
-        targets.append(img2bin(img))
+    bin_targets = []
+    for img in targets:
+        bin_targets.append(img2bin(img))
 
-    preds = []
-    for img in train_pred:
-        preds.append(img2bin(img))
+    bin_preds = []
+    for img in preds:
+        bin_preds.append(img2bin(img))
 
-    pred_targets = [(preds[i], targets[i]) for i in range(len(preds))]
+    pred_targets = [(bin_preds[i], bin_targets[i]) for i in range(len(bin_preds))]
 
     train_iou = []
     for pred, target in pred_targets:
