@@ -40,23 +40,23 @@ def main(augment=False, train_model=False, eval_model=False, EPOCHS=5):
     random.seed(random_seed)
 
     full_paths = {}
-    full_paths["training_imgs"] = os.path.join(dir_path,'..',PATH_DRIVE_train,PATH_DRIVE_img)
-    full_paths["targets"] = os.path.join(dir_path,'..',PATH_DRIVE_train,PATH_DRIVE_targets)
-    full_paths["testing_imgs"] = os.path.join(dir_path,'..',PATH_DRIVE_test,PATH_DRIVE_img)
-    full_paths["testing_targets"] = os.path.join(dir_path,'..',PATH_DRIVE_test,PATH_DRIVE_targets)
+    full_paths["DRIVE_train_imgs"] = os.path.join(dir_path,'..',PATH_DRIVE_train,PATH_DRIVE_img)
+    full_paths["DRIVE_train_targs"] = os.path.join(dir_path,'..',PATH_DRIVE_train,PATH_DRIVE_targets)
+    full_paths["DRIVE_test_imgs"] = os.path.join(dir_path,'..',PATH_DRIVE_test,PATH_DRIVE_img)
+    full_paths["DRIVE_test_targs"] = os.path.join(dir_path,'..',PATH_DRIVE_test,PATH_DRIVE_targets)
     full_paths["STARE_imgs"] = os.path.join(dir_path, '..', PATH_STARE_imgs)
     full_paths["STARE_masks_vk"] = os.path.join(dir_path, '..', PATH_STARE_masks_vk)
 
     # Training set
-    image_paths = list_img_paths(full_paths["training_imgs"], '.tif')
+    image_paths = list_img_paths(full_paths["DRIVE_train_imgs"], '.tif')
     image_paths.sort()
-    target_paths = list_img_paths(full_paths["targets"], '.tif')
+    target_paths = list_img_paths(full_paths["DRIVE_train_targs"], '.tif')
     target_paths.sort()
 
     # Testing set
-    test_image_paths = list_img_paths(full_paths["testing_imgs"], '.tif')
+    test_image_paths = list_img_paths(full_paths["DRIVE_test_imgs"], '.tif')
     test_image_paths.sort()
-    test_target_paths = list_img_paths(full_paths["testing_targets"], '.tif')
+    test_target_paths = list_img_paths(full_paths["DRIVE_test_targs"], '.tif')
     test_target_paths.sort()
 
     if augment:
@@ -147,6 +147,6 @@ if __name__ == "__main__":
     AUG = arguments['--augment']
     TRAIN = arguments['--train']
     EVAL = arguments['--eval']
-    EPOCHS = arguments['--epochs']
+    EPOCHS = int(arguments['--epochs'])
 
-    main(AUG, TRAIN, EVAL, int(EPOCHS))
+    main(AUG, TRAIN, EVAL, EPOCHS)
