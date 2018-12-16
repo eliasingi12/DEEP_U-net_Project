@@ -120,8 +120,8 @@ def main(augment=False, train_model=False, eval_model=False, EPOCHS=5):
         ### Display Images ###
         train_target = train_target.reshape(train_target.shape[0], 512, 512)
         test_target = test_target.reshape(test_target.shape[0], 512, 512)
-        train_pred = train_pred.reshape(train_pred.shape[0], 512, 512) 
-        test_pred = test_pred.reshape(test_pred.shape[0], 512, 512) 
+        train_pred = train_pred.reshape(train_pred.shape[0], 512, 512)
+        test_pred = test_pred.reshape(test_pred.shape[0], 512, 512)
 
         plt.imshow(train_pred[0], interpolation='nearest')
         plt.show()

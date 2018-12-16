@@ -42,10 +42,10 @@ def img2bin(img):
                 img_new[row][col] = 0
     return img_new.astype(int)
 
-def iou(pred,target):
-    intersection = pred*target
-    notTrue = 1 - target
-    union = target + (notTrue * pred)
+def iou(prediction,target):
+    intersection = prediction*target # numpy broadcasting, not normal matrix multiplication
+    targetComplement = 1 - target
+    union = target + (targetComplement * prediction)
     return np.sum(intersection)/np.sum(union)
 
 
@@ -63,11 +63,11 @@ def avg_iou(preds,targets):
 
     pred_targets = [(bin_preds[i], bin_targets[i]) for i in range(len(bin_preds))]
 
-    train_iou = []
+    list_iou = []
     for pred, target in pred_targets:
-        train_iou.append(iou(pred,target))
+        list_iou.append(iou(pred,target))
 
-    return sum(train_iou)/len(preds)
+    return sum(list_iou)/len(preds)
   
   
 def reshape_normalize(arr_to_reshape):
